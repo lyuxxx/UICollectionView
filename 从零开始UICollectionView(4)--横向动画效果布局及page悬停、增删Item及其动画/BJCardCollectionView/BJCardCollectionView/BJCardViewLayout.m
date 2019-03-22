@@ -34,7 +34,8 @@
     self.columnCount = [self.collectionView numberOfItemsInSection:0];    
     self.columnSpace = 20.0f;
     self.rowSpace = 10.0f;
-    self.sectionInsets = UIEdgeInsetsMake(5.0f, self.collectionView.bounds.size.width*0.35, 5.0f, self.collectionView.bounds.size.width*0.35);
+//    self.sectionInsets = UIEdgeInsetsMake(5.0f, self.collectionView.bounds.size.width*0.35, 5.0f, self.collectionView.bounds.size.width*0.35);
+    self.sectionInsets = UIEdgeInsetsMake(5, 5, 5, 5);
     self.contentX = self.sectionInsets.left;
     
 }
@@ -44,7 +45,9 @@
     [self.attributesArray removeAllObjects];
     for (NSInteger index = 0; index < [self.collectionView numberOfItemsInSection:0]; index++) {
         UICollectionViewLayoutAttributes * attributes = [self layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
-        [self.attributesArray addObject:attributes];
+        if (CGRectIntersectsRect(attributes.frame, rect)) {
+            [self.attributesArray addObject:attributes];
+        }
     }
         
     return self.attributesArray;
@@ -69,18 +72,22 @@
     self.contentX = attributes.frame.origin.x + attributes.frame.size.width;
 
     CGFloat centerX = self.collectionView.contentOffset.x + self.collectionView.frame.size.width * 0.5;
+    centerX = self.collectionView.contentOffset.x + self.sectionInsets.left + w * 0.5;
 
     CGFloat delta = ABS(attributes.center.x - centerX);
     CGFloat scale = 1.0 - delta / self.collectionView.frame.size.width;
+    if (scale < 0.8) {
+        scale = 0.8;
+    }
     attributes.transform = CGAffineTransformMakeScale(scale, scale);
-    
+
 //    CATransform3D transform = CATransform3DIdentity;
 //    transform.m34 = 0.001;
 //    transform = CATransform3DRotate(transform, DEGREES_TO_RADIANS(90*(attributes.center.x - centerX)/self.collectionView.frame.size.width*1.3), 0, 1, 1);
 //    attributes.transform3D = transform;
     
     attributes.alpha = scale;
-    
+
     return attributes;
 }
 
@@ -95,6 +102,7 @@
     CGFloat cardWidth = self.collectionView.bounds.size.width*0.3;
     
     CGFloat realMidX = proposedContentOffset.x + midCenterX;
+    realMidX = proposedContentOffset.x + self.sectionInsets.left + cardWidth * 0.5;
     
     CGFloat more = fmodf(realMidX-self.sectionInsets.left, cardWidth+self.columnSpace);
 

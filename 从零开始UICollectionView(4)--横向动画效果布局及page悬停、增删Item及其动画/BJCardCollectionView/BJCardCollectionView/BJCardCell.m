@@ -26,7 +26,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         [self.contentView addSubview:self.titleLabel];
-//        self.layer.anchorPoint = CGPointMake(0.5, 1);
+        self.layer.anchorPoint = CGPointMake(0.5, 1);
     }
     return self;
 }
